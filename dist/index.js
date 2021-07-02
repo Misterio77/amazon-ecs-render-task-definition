@@ -1166,6 +1166,9 @@ async function run() {
     const containerName = core.getInput('container-name', { required: true });
     const imageURI = core.getInput('image', { required: true });
 
+    const environmentVariable = core.getInput('environment-variable', { required: false });
+    const environmentVariableValue = core.getInput('environment-variable-value', { required: false });
+
     // Parse the task definition
     const taskDefPath = path.isAbsolute(taskDefinitionFile) ?
       taskDefinitionFile :
@@ -1186,6 +1189,37 @@ async function run() {
       throw new Error('Invalid task definition: Could not find container definition with matching name');
     }
     containerDef.image = imageURI;
+
+    // Insert environment variable
+    // If either one or the other are present
+    if (environmentVariable || environmentVariableValue) {
+      // If they are not both present
+      if (!(environmentVariable && environmentVariableValue)) {
+        throw new Error('Invalid inputs: environment-variable and environment-variable-values must be specified or ommited together')
+      }
+
+      // If environment array is missing, create it
+      if (!Array.isArray(containerDef.environment)) {
+        containerDef.environment = [];
+      }
+
+      // Find environment variable
+      var environmentDef = containerDef.environment.find(function(element) {
+        return element.name == environmentVariable;
+      });
+
+      // If not found, create it
+      if (!environmentDef) {
+        const index = containerDef.environment.push({
+          name: environmentVariableValue,
+          value: ""
+        })-1;
+        environmentDef = containerDef.environment[index];
+      }
+      // Put value in variable
+      environmentDef.value = environmentVariableValue;
+    }
+
 
     // Write out a new task definition file
     var updatedTaskDefFile = tmp.fileSync({
