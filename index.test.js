@@ -75,12 +75,12 @@ describe('Render task definition', () => {
                                 value: "bar"
                             },
                             {
-                                name: "HELLO",
-                                value: "world"
-                            },
-                            {
                                 name: "DONT-TOUCH",
                                 value: "me"
+                            },
+                            {
+                                name: "HELLO",
+                                value: "world"
                             }
                         ]
                     },
