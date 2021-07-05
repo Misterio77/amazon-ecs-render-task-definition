@@ -41,8 +41,6 @@ async function run() {
         containerDef.environment = [];
       }
 
-      // Build an environment array with names and values
-      var environment = [];
       // Get pairs by splitting with |
       environmentVariables.split('|').forEach(function (item) {
         // Split pairs on =
@@ -51,23 +49,20 @@ async function run() {
         if (pair.length != 2) {
           throw new Error('Each environment-variable pair must be of form NAME=value');
         }
-        // Add pair to environment array
-        environment.push({
+        // Build object
+        const variable = {
           name: pair[0],
           value: pair[1],
-        });
-      })
+        };
 
-      // For each desired environment
-      environment.forEach(function(item) {
         // Search container definition environment for one matching name
-        const variableDef = containerDef.environment.find((e) => e.name == item.name);
+        const variableDef = containerDef.environment.find((e) => e.name == variable.name);
         if (variableDef) {
           // If found, update
-          variableDef.value = item.value;
+          variableDef.value = variable.value;
         } else {
           // Else, create
-          containerDef.environment.push(item);
+          containerDef.environment.push(variable);
         }
       })
     }
