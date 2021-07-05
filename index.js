@@ -44,9 +44,9 @@ async function run() {
       // Build an environment array with names and values
       var environment = [];
       // Get pairs by splitting with |
-      for (var pair in environmentVariables.split('|')) {
+      environmentVariables.split('|').forEach(function (item) {
         // Split pairs on =
-        pair = pair.split('=');
+        const pair = item.split('=');
         // If that pair didn't have exactly 2 parts (name and value)
         if (pair.length != 2) {
           throw new Error('Each environment-variable pair must be of form NAME=value');
@@ -56,19 +56,20 @@ async function run() {
           name: pair[0],
           value: pair[1],
         });
-      }
+      })
+
       // For each desired environment
-      for (const variable in environment) {
+      environment.forEach(function(item) {
         // Search container definition environment for one matching name
-        const variableDef = containerDef.environment.find((e) => e.name == variable.name);
+        const variableDef = containerDef.environment.find((e) => e.name == item.name);
         if (variableDef) {
           // If found, update
-          variableDef.value = variable.value;
+          variableDef.value = item.value;
         } else {
           // Else, create
-          containerDef.environment.push(variable);
+          containerDef.environment.push(item);
         }
-      }
+      })
     }
 
 
